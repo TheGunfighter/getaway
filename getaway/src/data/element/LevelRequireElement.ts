@@ -24,6 +24,8 @@
 //最大行数
 //最大列数
 //空白地图数量
+// 
+//
 class LevelRequireElement extends BaseElement{
 	
 	public num:number = 0;
