@@ -62,17 +62,28 @@ class Main extends egret.DisplayObjectContainer {
 
     }
 
+
+    /**
+     * 运行入口
+     */
     private async runGame() {
+        //加载资源
         await this.loadResource()
+        //创建场景
         this.createGameScene();
         const result = await RES.getResAsync("description_json")
         this.startAnimation(result);
         await platform.login();
+        //获取用户信息
         const userInfo = await platform.getUserInfo();
         console.log(userInfo);
 
     }
 
+
+    /**
+     * 加载资源
+     */
     private async loadResource() {
         try {
             const loadingView = new LoadingUI();
