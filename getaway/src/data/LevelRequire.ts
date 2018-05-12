@@ -19,6 +19,7 @@ class LevelRequire {
 	public addElement(type:string,num:number){
 		var ele:LevelRequireElement = new LevelRequireElement();
 		ele.num = num;
+		ele.type = type;
 		this.reqElements.push(ele);
 	}
 
