@@ -10,7 +10,7 @@ class LevelGameDataParse {
 	}
 
 
-	//关关条件
+	//过关条件
 	private static parselevelReq(val:any){
 		GameData.levelreq.openChange();
 		var len: number = val.length;
