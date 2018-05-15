@@ -269,9 +269,39 @@ class LinkLogic {
 	}
 
 	/**
-	 * 
+	 * 空间交换链接消除算法
 	 */
+	 public static isHaveLineByIndex(p1:number,p2:number):boolean
+	 {
+	 	var p1n:number = p1;
+	 	var p2n:number = p2;
 
+	 	//获取第一个元素的id
+	 	var p1id:number = GameData.mapData[Math.floor(p1 / GameData.MaxColumn)][p1 % GameData.MaxRow];
+	 	//获取第二个元素的id
+	 	var p2id:number = GameData.mapData[Math.floor(p2 / GameData.MaxColumn)][p2 % GameData.MaxRow];
+
+	 	//交换两个元素的值
+	 	GameData.mapData[Math.floor(p1 / GameData.MaxColumn)][p1 % GameData.MaxRow] = p2id;
+	 	GameData.mapData[Math.floor(p2 / GameData.MaxColumn)][p2 % GameData.MaxRow] = p1id;
+
+	 	//调用上面的方法看交换完之后是否为ture
+	 	var rel:boolean = LinkLogic.isHaveLine();
+	 	if(rel)
+	 	{
+	 		GameData.elements[p1id].location = p2;
+	 		GameData.elements[p2id].location = p1;	
+	 		return true;
+	 	}
+	 	else
+	 	{	//不可以的话就把刚才的交换赋值，做逆向操作
+	 		GameData.mapData[Math.floor(p1 / GameData.MaxColumn)][p1 % GameData.MaxRow] = p1id;
+	 		GameData.mapData[Math.floor(p2 / GameData.MaxColumn)][p2 % GameData.MaxRow] = p2id;
+	 	}
+
+	 	//所有操作完之后没有任何的结果就给false
+	 	return false;
+	 }
 
 
 
