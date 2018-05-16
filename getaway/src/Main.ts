@@ -28,21 +28,16 @@
 //////////////////////////////////////////////////////////////////////////////////////
 
 class Main extends egret.DisplayObjectContainer {
-
-
-
     public constructor() {
         super();
-        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
+        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);//监听当前舞台完成的创建
     }
 
-    private onAddToStage(event: egret.Event) {
-
+    //舞台初始化响应函数
+    private onAddToStage(event: egret.Event) { //
         egret.lifecycle.addLifecycleListener((context) => {
             // custom lifecycle plugin
-
             context.onUpdate = () => {
-
             }
         })
 
@@ -57,10 +52,9 @@ class Main extends egret.DisplayObjectContainer {
         this.runGame().catch(e => {
             console.log(e);
         })
-
-
-
     }
+
+    private onConfigComplete(){}
 
 
     /**
@@ -88,8 +82,8 @@ class Main extends egret.DisplayObjectContainer {
         try {
             const loadingView = new LoadingUI();
             this.stage.addChild(loadingView);
-            await RES.loadConfig("resource/default.res.json", "resource/");
-            await RES.loadGroup("preload", 0, loadingView);
+            await RES.loadConfig("resource/default.res.json", "resource/"); //加载配置文件
+            await RES.loadGroup("preload", 0, loadingView); //组加载
             this.stage.removeChild(loadingView);
         }
         catch (e) {
