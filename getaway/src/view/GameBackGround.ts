@@ -1,10 +1,13 @@
 //
-//背景类显示列表
+//背景类显示列表 
+
 class GameBackGround extends egret.Sprite{
+
 	public constructor() {
-		super();
+		super();//super继承必须执行
 	}
 
+	//关卡更新重构场景
 	public changeBackground(){
 		this.cacheAsBitmap = false;
 		this.removeChildren();
@@ -15,12 +18,12 @@ class GameBackGround extends egret.Sprite{
 		this.cacheAsBitmap = true;
 	}
 
-	private bgImage: egret.Bitmap;
-	private girdBg: egret.Bitmap[];
+	private bgImage: egret.Bitmap;//地图背景
+	private girdBg: egret.Bitmap[];//网格背景
 
 	//创建地图背景图片
 	private createBackGroundImage(){
-		if(!this.bgImage){
+		if(!this.bgImage){//如果地图未初始化，初始化bitmap
 			this.bgImage = new egret.Bitmap();
 		}
 
@@ -35,6 +38,7 @@ class GameBackGround extends egret.Sprite{
 		propbg.texture = RES.getRes("propbg_png");
 		propbg.width =GameData.stageW;
 		propbg.height = GameData.stageH / 5 + 20;
+		//居底对齐，所以设置y轴
 		propbg.y = GameData.stageH - propbg.height;
 		this.addChild(propbg);
 	}
@@ -44,11 +48,12 @@ class GameBackGround extends egret.Sprite{
 	 */
 	private createMapbg(){
 		if(!this.girdBg){
-			this.girdBg = new Array();
+			this.girdBg = new Array(); //定义格子数组
 		}
-		var gird:egret.Bitmap;
-		var girdWidth:number = (GameData.stageW - 40) / GameData.MaxColumn;
+		var gird:egret.Bitmap;//数组每一元素为位图
+		var girdWidth:number = (GameData.stageW - 40) / GameData.MaxColumn;//宽高值
 		var startY: number = (GameData.stageH - (GameData.stageW - 30 )/6 -60)-girdWidth* GameData.MaxColumn; 
+		
 		for(var i:number =0;i<GameData.MaxRow;i++){
 			for(var t:number =0; t<GameData.MaxColumn;t++){
 				if(GameData.mapData[i][t] != -1){
@@ -62,10 +67,10 @@ class GameBackGround extends egret.Sprite{
 					gird.height = girdWidth;
 					gird.x = 20+girdWidth*i;
 					gird.y = startY + girdWidth * i;
-					if( (i % 2 == 0 && t%2 == 0) || (i%2 ==1 && t%2 ==1) ){
+					if( (i % 2 == 0 && t%2 == 0) || (i%2 ==1 && t%2 ==1) ){ //单数行
 						gird.texture = RES.getRes("elementbg1_png");
 					}else{
-						gird.texture = RES.getRes("elementbg2_png");
+						gird.texture = RES.getRes("elementbg2_png"); //双数行设置一种皮肤
 					}
 					this.addChild(gird);
 				}
