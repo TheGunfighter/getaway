@@ -62,7 +62,7 @@ class Main extends egret.DisplayObjectContainer {
      */
     private async runGame() {
         //加载资源
-        await this.loadResource()
+        await this.loadResource();
         //创建场景
         this.createGameScene();
         const result = await RES.getResAsync("description_json")
@@ -82,8 +82,8 @@ class Main extends egret.DisplayObjectContainer {
         try {
             const loadingView = new LoadingUI();
             this.stage.addChild(loadingView);
-            await RES.loadConfig("resource/default.res.json", "resource/"); //加载配置文件
-            await RES.loadGroup("game", 0, loadingView); //组加载
+            await RES.loadConfig("resource/default.res.json", "resource/"); //加载资源配置文件
+            await RES.loadGroup("game", 0, loadingView); //资源组加载
             this.stage.removeChild(loadingView);
         }
         catch (e) {
