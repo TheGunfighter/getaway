@@ -1,3 +1,5 @@
+//
+//背景类显示列表
 class GameBackGround extends egret.Sprite{
 	public constructor() {
 		super();
@@ -6,6 +8,7 @@ class GameBackGround extends egret.Sprite{
 	private bgImage: egret.Bitmap;
 	private girdBg: egret.Bitmap[];
 
+	//创建场景图片
 	private createBackGroundImage(){
 		if(!this.bgImage){
 			this.bgImage = new egret.Bitmap();
@@ -24,13 +27,23 @@ class GameBackGround extends egret.Sprite{
 		this.addChild(propbg);
 	}
 
+	/**
+	 * 创建地图背景
+	 */
 	private createMapbg(){
 
 	}
 
+	/**
+	 * 创建关卡地图场景
+	 */
 	private createLevae(){
 
 	}
+
+	/**
+	 * 
+	 */
 	private cteateStepbg(){
 
 	}
