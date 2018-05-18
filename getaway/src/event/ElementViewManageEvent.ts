@@ -6,6 +6,7 @@ class ElementViewManageEvent extends egret.Event
 	public static REMOVE_ANIMATION_OVER:string = "remove_animation_over";
 	public static UPDATE_MAP:string = "update_map";
 	public static UPDATE_VIEW_OVER:string = "update_view_over";
+	public static USE_PROP_CLICK:string = "use_prop_click";
 
 	//属性
 	public propToElementLocation:number = 0;//携带道具点击元素的位置
