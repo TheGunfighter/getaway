@@ -5,8 +5,7 @@ class MapControl
 	}
 
 	//创建全地图元素
-	public createElementAllmap()
-	{
+	public createElementAllmap(){
 		this.createAllMap();
 	}
 
