@@ -280,7 +280,7 @@ class ElementViewManage extends egret.EventDispatcher
     {
         //乱序移动指令触发
         var len:number = this.elementviews.length;
-        egret.Tween.removeAllTweens(); //暂停所有动画
+        egret.Tween.removeAllTweens();
         for(var i:number=0;i<len;i++)
         {
             this.elementviews[i].location=GameData.elements[i].location;

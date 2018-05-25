@@ -1,52 +1,65 @@
-//
-//过关条件筛选 （对象池）
-class LevelRequire {
+class LevelRequire
+{
+    /*
+        过关条件，内置一个数组，用来记录当前关卡需要消除多少种
+        类型的元素。
+        每种元素要消除的数量为多少
+     */
+    public reqElements:Array<LevelRequireElement>;
 
+    public constructor()
+    {
+        this.reqElements = new Array();
+    }
 
-	public reqElements:LevelRequireElement[];
+    //过卡过关条件数量
+    public getLevelReqNum():number
+    {
+        return this.reqElements.length;
+    }
 
-	public constructor() {
-		this.reqElements = [];
-	}
+    //添加一个关卡元素，类型与数量
+    public addElement(type:string,num:number)
+    {
+        var element:LevelRequireElement = new LevelRequireElement();
+        element.num = num;
+        element.type = type;
+        this.reqElements.push( element );
+    }
 
-	//过关条件的数量（需要消除多少元素过关）
-	public getLevelReqNum():number
-	{
-		return this.getLevelReqNum.length;
-	}
+    //启动关卡条件修改
+    public openChange()
+    {
+        this.reqElements = [];
+    }
 
-	//添加关卡元素对象池
-	public addElement(type:string,num:number){
-		var ele:LevelRequireElement = new LevelRequireElement();
-		ele.num = num;
-		ele.type = type;
-		this.reqElements.push(ele);
-	}
+    //减少关卡中得元素数量
+    public changeReqNum(type:string,num:number)
+    {
+        var l:number = this.getLevelReqNum();
+        for(var i:number=0;i<l;i++)
+        {
+            if(this.reqElements[i].type == type)
+            {
+                this.reqElements[i].num-=num;
+                console.log("最新数量",this.reqElements[i].num);
+                return;
+            }
+        }
+    }
 
-	//启动关卡修改
-	public openChange(){
-		this.reqElements = [];
-	}
+    //检测所有关卡元素是否都被删除
+    public isClear():boolean
+    {
+        var l:number = this.getLevelReqNum();
+        for(var i:number=0;i<l;i++)
+        {
+            if(this.reqElements[i].num>0)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
-	//减少关卡中元素数量
-	public changeReqNum(type:string,num:number){
-		var l:number = this.getLevelReqNum();
-		for(var i =0; i<l;i++){
-			if(this.reqElements[i].type==type){
-				this.reqElements[i].num -= num;
-				return;
-			}
-		}
-	}
-
-	//判断玩家是否通关
-	public isClear():boolean{
-		var l:number = this.getLevelReqNum();
-		for(var i =0 ;i<l;i++){
-			if(this.reqElements[i].num>0){
-				return false;
-			}
-		}
-		return true;
-	}
 }

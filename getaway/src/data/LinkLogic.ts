@@ -1,166 +1,274 @@
-//检索逻辑类
-class LinkLogic {
-	
+class LinkLogic
+{
+    public static lines:number[][]; //检索后的数据池，即将被消除的元素ID
 
-	/**
-	 * 当前搜索结果有无可消除数据
-	 */
-	public static lines: number[][]; //存放用于消除的数据
-	public static isHaveLine():boolean{
-		LinkLogic.lines = [];
-		var currentType:string = ""; //标记当前类型
-		var typeNum : number = 0;    //当前数据类型 
-		//行检索
-		for(var i =0;i<GameData.MaxRow;i++){
-			for(var t =0;t<GameData.MaxColumn;t++){
-				if(GameData.mapData[i][t] !=-1){ //有元素或没元素
-					if(currentType != GameData.elements[GameData[i][t]].type){ //当前类型与存放类型不同
-						if( typeNum >=3){ //上一组计数大于三，有可消除数据
-							var arr:number[] =[];
-							for(var q =0; q<typeNum;q++){
-								arr.push(GameData.mapData[i][t-q-1]);
-							}
-							LinkLogic.lines.push(arr);
-						}
-						currentType = GameData.elements[GameData[i][t]].type; 
-						typeNum = 1;
-					}else{
-						typeNum++;
-					}
-				}else{
-					if(typeNum >=3){
-						var arr:number[] =[];
-							for(var q =0; q<typeNum;q++){
-								arr.push(GameData.mapData[i][t-q-1]);
-							}
-							LinkLogic.lines.push(arr);
-					}
-					currentType = "";
-					typeNum = 0;
-				}
-			}
-			//一行判断完成以后结尾
-			if(typeNum >=3){
-				var arr:number[] =[];
-				for(var q =0; q<typeNum;q++){
-					arr.push(GameData.mapData[i][t-q-1]);
-				}
-				LinkLogic.lines.push(arr);
-			}
-			currentType = "";
-			typeNum = 0;
-		}
+    //检查是否存在可消除项目
+    public static isHaveLine():boolean
+    {
+        LinkLogic.lines = new Array();
+        var currentType:string = "";
+        var typeNum:number = 0;
 
-		//纵向判断
-		for(i =0; i<GameData.MaxRow;i++){
-			for(var t =0;t<GameData.MaxColumn;i++){
-				if(GameData.mapData[t][i] != -1){
-					if(currentType != GameData.elements[GameData.mapData[t][i]].type){
-						if( typeNum >=3){
-							var arr:number[] = [];
-							for(q = 0; q < typeNum; q++){
-								arr.push(GameData.mapData[t - q -1][i]);
-							}
-							LinkLogic.lines.push(arr);
-						}
-						currentType = GameData.elements[GameData.mapData[t][i]].type;
-						typeNum = 1;
-					}else{
-						typeNum++;
-					}
-				}else{
-					if( typeNum >=3){
-						var arr:number[] = [];
-						for(q = 0; q < typeNum; q++){
-							arr.push(GameData.mapData[t - q -1][i]);
-						}
-						LinkLogic.lines.push(arr);
-					}
-					currentType = "";
-					typeNum = 0;
-				}
-			}
-			if( typeNum >=3){
-				var arr:number[] = [];
-				for(q = 0; q < typeNum; q++){
-					arr.push(GameData.mapData[t - q -1][i]);
-				}
-				LinkLogic.lines.push(arr);
-			}
-			currentType = "";
-			typeNum = 0;
-		}
-		if( LinkLogic.lines.length!=0 ){
-			return true;
-		}
-		return false;
-	}
+        //横向，自左向右检索
+        for (var i:number = 0; i < GameData.MaxRow; i++) {
+            for (var t:number = 0; t < GameData.MaxColumn; t++)
+            {
+                if (GameData.mapData[i][t] != -1) {
+                    if (currentType != GameData.elements[GameData.mapData[i][t]].type)
+                    {
+                        if (typeNum >= 3)//上一组检测结束了，把数据存储进去
+                        {
+                            var arr:Array<number> = new Array();
+                            for (var q:number = 0; q < typeNum; q++)
+                            {
+                                arr.push(GameData.mapData[i][t - q - 1]);
+                                console.log("横压入数组",i,(t - q - 1),GameData.mapData[i][t - q - 1]);
+                            }
+                            LinkLogic.lines.push(arr);
+                        }
+                        currentType = GameData.elements[GameData.mapData[i][t]].type;
+                        typeNum = 1;
+                    }
+                    else
+                    {
+                        typeNum++;
+                    }
+                }
+                else
+                {
+                    if (typeNum >= 3)//上一组检测结束了，把数据存储进去
+                    {
+                        var arr:Array<number> = new Array();
+                        for (var q:number = 0; q < typeNum; q++)
+                        {
+                            arr.push(GameData.mapData[i][t - q - 1]);
+                            console.log("横压入数组",i,(t - q - 1),GameData.mapData[i][t - q - 1]);
+                        }
+                        LinkLogic.lines.push(arr);
+                    }
+                    currentType = "";
+                    typeNum = 0;
+                }
+            }
+
+            //一行结束后，再次判断
+            if (typeNum >= 3)//上一组检测结束了，把数据存储进去
+            {
+                var arr:Array<number> = new Array();
+                for (var q:number = 0; q < typeNum; q++)
+                {
+                    console.log("横压入数组2",i,(t - q - 1),GameData.mapData[i][t - q - 1]);
+                    arr.push(GameData.mapData[i][t - q - 1]);
+                }
+                LinkLogic.lines.push(arr);
+            }
+            //一行结束后，清空数据
+            currentType = "";
+            typeNum = 0;
+        }
 
 
-	/**
-	 * 判断有没有下一步可走
-	 * 预检索算法，找到能移动一次便消除不做任何处理，找不到就乱序重置元素顺序
-	 * 排列特征
-	 * 1 2深红周围6个方块
-	 * 2 
-	 */
-	public static isNextHaveLine():boolean
-	{
-		//循环行进行检索
-		for(var i = 0;i <GameData.MaxRow;i++)
-		{
-			for(var t = 0;t<GameData.MaxColumn;t++)
-			{	//当前的元素不可为-1
-				if( GameData.mapData[i][t] !=-1)
-				{	//判断下一个元素和极限值问题，若没问题进行判断当前的元素和下一个元素是否相同 
-					if( t<(GameData.MaxColumn-1) && GameData.mapData[i][t+1] != -1 && GameData.elements[ GameData[i][t] ].type == GameData.elements[ GameData[i][t+1] ].type)
-					{
-						if(t>0 && GameData.mapData[i][t-1]!=-1) //
-						{	//左上角的元素不为空，不为-1，在进行判断左上角的元素和当前的元素是否类型相同
-							if(i>0 && t>0 && GameData.mapData[i-1][t-1] &&  GameData.mapData[i-1][t-1]!=-1 && GameData.elements[GameData.mapData[i-1][t-1]].type == GameData.elements[ GameData[i][t] ].type)
-							{
-								return true;	
-							}
-							if(i< (GameData.MaxRow - 1)&& t>0 && GameData.mapData[i+1][t-1] && GameData.mapData[i+1][t-1] != -1 && GameData.elements[ GameData.mapData[i+1][t-1] ].type == GameData.elements[ GameData.mapData[i][t] ].type)
-							{
-								return true;
-							}
-							if(t>1 && GameData.mapData[i][t-2] && GameData.mapData[i][t-2] != -1 && GameData.elements[ GameData.mapData[i][t-2] ].type == GameData.elements[ GameData.mapData[i][t] ].type)
-							{
-								return true;
-							}
-						}
-						//判断右侧
-						if(t < (GameData.MaxColumn -1) && GameData[i][t+2] != -1)
-						{
-							if(t < (GameData.MaxColumn - 2) && i > 0 && GameData.mapData[i-1][t+2] && GameData.mapData[i-1][t+2] != -1 && GameData.elements[ GameData.mapData[i-1][t+2] ].type == GameData.elements[ GameData.mapData[i][t] ].type)
-							{
-								return true;
-							}
-							if(t < (GameData.MaxColumn - 2) && i < (GameData.MaxRow- 1) && GameData.mapData[i+1][t+2] && GameData.mapData[i+1][t+2] != -1 &&  GameData.elements[ GameData.mapData[i+1][t+2] ].type == GameData.elements[ GameData.mapData[i][t] ].type)
-							{
-								return true;
-							}
-							if(t < (GameData.MaxColumn - 3) && GameData.mapData[i][t+3] && GameData.mapData[i][t+3] != -1 && GameData.elements[ GameData.mapData[i][t+3] ].type ==  GameData.elements[ GameData.mapData[i][t] ].type)
-							{
-								return true;
-							}
-						}
-					}
+        //纵向搜索是，自顶，向下
+        for ( i = 0; i < GameData.MaxRow; i++) {
+            for ( t = 0; t < GameData.MaxColumn; t++)
+            {
+                if (GameData.mapData[t][i] != -1) {
+                    if (currentType != GameData.elements[GameData.mapData[t][i]].type)
+                    {
+                        if (typeNum >= 3)//上一组检测结束了，把数据存储进去
+                        {
+                            var arr:Array<number> = new Array();
+                            for ( q = 0; q < typeNum; q++)
+                            {
+                                arr.push(GameData.mapData[t - q - 1][i]);
+                                console.log("纵压入数组",i,(t - q - 1),GameData.mapData[i][t - q - 1]);
+                            }
+                            LinkLogic.lines.push(arr);
+                        }
+                        currentType = GameData.elements[GameData.mapData[t][i]].type;
+                        typeNum = 1;
+                    }
+                    else
+                    {
+                        typeNum++;
+                    }
+                }
+                else
+                {
+                    if (typeNum >= 3)//上一组检测结束了，把数据存储进去
+                    {
+                        var arr:Array<number> = new Array();
+                        for ( q = 0; q < typeNum; q++)
+                        {
+                            arr.push(GameData.mapData[t - q - 1][i]);
+                            console.log("纵压入数组",i,(t - q - 1),GameData.mapData[i][t - q - 1]);
+                        }
+                        LinkLogic.lines.push(arr);
+                    }
+                    currentType = "";
+                    typeNum = 0;
+                }
+            }
+
+            //一行结束后，再次判断
+            if (typeNum >= 3)//上一组检测结束了，把数据存储进去
+            {
+                var arr:Array<number> = new Array();
+                for (var q:number = 0; q < typeNum; q++)
+                {
+                    console.log("2纵压入数组",i,(t - q - 1),GameData.mapData[i][t - q - 1]);
+                    arr.push(GameData.mapData[t - q - 1][i]);
+                }
+                LinkLogic.lines.push(arr);
+            }
+            //一行结束后，清空数据
+            currentType = "";
+            typeNum = 0;
+        }
+
+
+        if(LinkLogic.lines.length!=0 )
+        {
+            console.log("未过滤数组",LinkLogic.lines);
+            return true;
+        }
+
+        return false;
+    }
+
+    //根据移动后的某一点，检测消除项目
+    //参数未互换得两个点得位置,0-80编号
+    //在地图中，将ID互换，然后检查舞台中有没有能消除得格子，如果有，返回true，如果没有，把数据切换回来
+    public static isHaveLineByIndex(p1:number,p2:number):boolean
+    {
+        var p1n:number = p1;
+        var p2n:number = p2;
+
+        var p1id:number = GameData.mapData[Math.floor(p1/GameData.MaxColumn)][p1%GameData.MaxRow];
+        var p2id:number = GameData.mapData[Math.floor(p2/GameData.MaxColumn)][p2%GameData.MaxRow];
+
+        GameData.mapData[Math.floor(p1/GameData.MaxColumn)][p1%GameData.MaxRow] = p2id;
+        GameData.mapData[Math.floor(p2/GameData.MaxColumn)][p2%GameData.MaxRow] = p1id;
+
+        var rel:boolean = LinkLogic.isHaveLine();
+        if(rel)
+        {
+            GameData.elements[p1id].location = p2;
+            GameData.elements[p2id].location = p1;
+            return true;
+        }
+        else
+        {
+            GameData.mapData[Math.floor(p1/GameData.MaxColumn)][p1%GameData.MaxRow] = p1id;
+            GameData.mapData[Math.floor(p2/GameData.MaxColumn)][p2%GameData.MaxRow] = p2id;
+        }
+
+        return false;
+    }
+
+    //打乱所有顺序,在没有能连接的情况下使用
+    public static changeOrder():void
+    {
+        var arr:number[] = new Array();
+        for(var i:number=0;i<GameData.MaxRow;i++) {
+            for (var t:number = 0; t < GameData.MaxColumn; t++) {
+                if(GameData.mapData[i][t]!=-1)
+                {
+                    arr.push(GameData.mapData[i][t]);
+                }
+            }
+        }
+
+        //console.log(arr.length);
+        var index:number = 0;
+        for( i=0;i<GameData.MaxRow;i++) {
+            for ( t = 0; t < GameData.MaxColumn; t++) {
+                if(GameData.mapData[i][t]!=-1) {
+                    index = Math.floor(Math.random() * arr.length);
+                    GameData.mapData[i][t] = arr[index];
+                    GameData.elements[arr[index]].location = i*GameData.MaxColumn + t;
+                    arr.splice(index,1);
+                    //console.log("数组长度",arr.length);
+                }
+            }
+        }
+    }
+
+    //检查是否存在移动一步后能够消除的项目
+    public static isNextHaveLine():boolean
+    {
+        //逐个分析，搜索横向与纵向两种情况，同时每个方向有两种拼接方式
+        //-------方式1-------
+        //   口    口
+        // 口  ▇ ▇   口
+        //   口    口
+        //-------方式2--------
+        //   口
+        //  ▇  ▇
+        //   口
+        for(var i:number=0;i<GameData.MaxRow;i++) {
+            for (var t:number = 0; t < GameData.MaxColumn; t++) {
+                if (GameData.mapData[i][t] != -1) {
+                    //横向 方式1
+                    //console.log(i,t);
+                    if(t<(GameData.MaxColumn-1)&&GameData.mapData[i][t+1]!=-1&&GameData.elements[GameData.mapData[i][t]].type==GameData.elements[GameData.mapData[i][t+1]].type)
+                    {
+                        if(t>0&&GameData.mapData[i][t-1]!=-1)
+                        {
+                            if(i>0&&t>0&&GameData.mapData[i-1][t-1]&&GameData.mapData[i-1][t-1]!=-1&&GameData.elements[GameData.mapData[i-1][t-1]].type==GameData.elements[GameData.mapData[i][t]].type)
+                            {
+                                console.log("-1能消除项目1！！！",i,t);
+                                return true;
+                            }
+                            if(i<(GameData.MaxRow-1)&&t>0&&GameData.mapData[i+1][t-1]&&GameData.mapData[i+1][t-1]!=-1&&GameData.elements[GameData.mapData[i+1][t-1]].type==GameData.elements[GameData.mapData[i][t]].type)
+                            {
+                                console.log("-1能消除项目2！！！",i,t);
+                                return true;
+                            }
+                            if(t>1&&GameData.mapData[i][t-2]&&GameData.mapData[i][t-2]!=-1&&GameData.elements[GameData.mapData[i][t-2]].type==GameData.elements[GameData.mapData[i][t]].type)
+                            {
+                                console.log("-1能消除项目3！！！",i,t);
+                                return true;
+                            }
+                        }
+                        if(t<(GameData.MaxColumn-1)&&GameData.mapData[i][t+2]!=-1)
+                        {
+                            if(t<(GameData.MaxColumn-2)&&i>0&&GameData.mapData[i-1][t+2]&&GameData.mapData[i-1][t+2]!=-1&&GameData.elements[GameData.mapData[i-1][t+2]].type==GameData.elements[GameData.mapData[i][t]].type)
+                            {
+                                console.log("-1能消除项目4！！！",i,t);
+                                return true;
+                            }
+                            if(t<(GameData.MaxColumn-2)&&i<(GameData.MaxRow-1)&&GameData.mapData[i+1][t+2]&&GameData.mapData[i+1][t+2]!=-1&&GameData.elements[GameData.mapData[i+1][t+2]].type==GameData.elements[GameData.mapData[i][t]].type)
+                            {
+                                console.log("-1能消除项目5！！！",i,t);
+                                return true;
+                            }
+                            if(t<(GameData.MaxColumn-3)&&GameData.mapData[i][t+3]&&GameData.mapData[i][t+3]!=-1&&GameData.elements[GameData.mapData[i][t+3]].type==GameData.elements[GameData.mapData[i][t]].type)
+                            {
+                                console.log("-1能消除项目6！！！",i,t);
+                                return true;
+                            }
+                        }
+
+                    }
+                    //纵向 方式1
                     if(i<(GameData.MaxRow-1)&&GameData.mapData[i+1][t]!=-1&&GameData.elements[GameData.mapData[i][t]].type==GameData.elements[GameData.mapData[i+1][t]].type)
                     {
                         if(i>0&&GameData.mapData[i-1][t]!=-1)
                         {
                             if(i>1&&GameData.mapData[i-2][t]&&GameData.mapData[i-2][t]!=-1&&GameData.elements[GameData.mapData[i-2][t]].type==GameData.elements[GameData.mapData[i][t]].type)
                             {
+                                console.log("|1能消除项目1！！！",i,t);
                                 return true;
                             }
                             if(i>0&&t>0&&GameData.mapData[i-1][t-1]&&GameData.mapData[i-1][t-1]!=-1&&GameData.elements[GameData.mapData[i-1][t-1]].type==GameData.elements[GameData.mapData[i][t]].type)
                             {
+                                console.log("|1能消除项目2！！！",i,t);
                                 return true;
                             }
                             if(i>0&&t<(GameData.MaxColumn-1)&&GameData.mapData[i-1][t+1]&&GameData.mapData[i-1][t+1]!=-1&&GameData.elements[GameData.mapData[i-1][t+1]].type==GameData.elements[GameData.mapData[i][t]].type)
                             {
+                                console.log("|1能消除项目3！！！",i,t);
                                 return true;
                             }
                         }
@@ -168,146 +276,87 @@ class LinkLogic {
                         {
                             if(i<(GameData.MaxRow-3)&&GameData.mapData[i+3][t]&&GameData.mapData[i+3][t]!=-1&&GameData.elements[GameData.mapData[i+3][t]].type==GameData.elements[GameData.mapData[i][t]].type)
                             {
+                                console.log("|1能消除项目4！！！",i,t);
                                 return true;
                             }
                             if(t<(GameData.MaxColumn-2)&&GameData.mapData[i+2][t+1]&&GameData.mapData[i+2][t+1]!=-1&&GameData.elements[GameData.mapData[i+2][t+1]].type==GameData.elements[GameData.mapData[i][t]].type)
                             {
+                                console.log("|1能消除项目5！！！",i,t);
                                 return true;
                             }
                             if(t>0&&GameData.mapData[i+2][t-1]&&GameData.mapData[i+2][t-1]!=-1&&GameData.elements[GameData.mapData[i+2][t-1]].type==GameData.elements[GameData.mapData[i][t]].type)
                             {
+                                console.log("|1能消除项目6！！！",i,t);
                                 return true;
                             }
                         }
                     }
+                    //横向 方式2
                     if(t<(GameData.MaxColumn-2)&&GameData.mapData[i][t+2]!=-1&&GameData.elements[GameData.mapData[i][t]].type==GameData.elements[GameData.mapData[i][t+2]].type)
                     {
                         if(GameData.mapData[i][t+1]!=-1)
                         {
                             if(i>0&&GameData.mapData[i-1][t+1]&&GameData.mapData[i-1][t+1]!=-1&&GameData.elements[GameData.mapData[i-1][t+1]].type==GameData.elements[GameData.mapData[i][t]].type)
                             {
+                                console.log("-2能消除项目1！！！",i,t);
                                 return true;
                             }
                             if(i<(GameData.MaxRow-1)&&GameData.mapData[i+1][t+1]&&GameData.mapData[i+1][t+1]!=-1&&GameData.elements[GameData.mapData[i+1][t+1]].type==GameData.elements[GameData.mapData[i][t]].type)
                             {
+                                console.log("-2能消除项目2！！！",i,t);
                                 return true;
                             }
                         }
                     }
+                    //纵向 方式2
                     if(i<(GameData.MaxRow-2)&&GameData.mapData[i+2][t]!=-1&&GameData.elements[GameData.mapData[i][t]].type==GameData.elements[GameData.mapData[i+2][t]].type)
                     {
                         if(GameData.mapData[i+1][t]!=-1)
                         {
                             if(t<(GameData.MaxColumn-1)&&GameData.mapData[i+1][t+1]&&GameData.mapData[i+1][t+1]!=-1&&GameData.elements[GameData.mapData[i+1][t+1]].type==GameData.elements[GameData.mapData[i][t]].type)
                             {
+                                console.log("|2能消除项目1！！！",i,t);
                                 return true;
                             }
                             if(i<(GameData.MaxRow-1)&&t>0&&GameData.mapData[i+1][t-1]&&GameData.mapData[i+1][t-1]!=-1&&GameData.elements[GameData.mapData[i+1][t-1]].type==GameData.elements[GameData.mapData[i][t]].type)
                             {
+                                console.log("|2能消除项目2！！！",i,t);
                                 return true;
                             }
                         }
                     }
+                }
+            }
+        }
+        return false;
+    }
 
-				}
-			}
-		}
-		return false;
-	}
+    //判断两个点是否可以互相移动，关系是否为上下，左右
+    public static canMove(id1:number,id2:number):boolean
+    {
+        var l1row:number = Math.floor(GameData.elements[id1].location/GameData.MaxRow);
+        var l1col:number = GameData.elements[id1].location%GameData.MaxColumn;
 
-
-	/**
-	 * 元素空间交换算法
-	 * 是否可以位置交换
-	 * 1相邻（横向/纵向）
-	 * 
-	 */
-	public static canMove(id1:number,id2:number):boolean{
-		var l1row:number = Math.floor(GameData.elements[id1].location/GameData.MaxRow);
-		var l1col:number = GameData.elements[id1].location % GameData.MaxColumn;
-		
-		var l2row:number = Math.floor(GameData.elements[id2].location/GameData.MaxRow);
-		var l2col:number = GameData.elements[id2].location % GameData.MaxColumn;
-		//行相同可交换
-		if(l1row == l2row){
-			if(Math.abs(l1col-l2col)== 1){
-				return true;
-			}
-		}
-		//列相同
-		if(l1col == l2col){
-			if(Math.abs(l1row-l2row)== 1){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * 全局乱序算法
-	 * 当无可移动元素时乱序排列元素
-	 */
-	public static changeOrder(){
-		var arr:number[]= [];
-		for(var i =0; i<GameData.MaxRow;i++){
-			for(var t =0 ;t< GameData.MaxColumn;t++){
-				if(GameData.mapData[i][t] != -1){
-					arr.push(GameData.mapData[i][t]);
-				}
-			}
-		}
-
-		var index:number = 0;
-		for(var i =0; i<GameData.MaxRow;i++){
-			for(var t =0 ;t< GameData.MaxColumn;t++){
-				index = Math.floor(Math.random()* arr.length);
-				GameData.mapData[i][t] = arr[index];
-				GameData.elements[arr[index]].location = i * GameData.MaxColumn + t; 
-				arr.slice(index,i);
-			}
-		}
-	}
-
-	/**
-	 * 空间交换链接消除算法
-	 */
-	 public static isHaveLineByIndex(p1:number,p2:number):boolean
-	 {
-	 	var p1n:number = p1;
-	 	var p2n:number = p2;
-
-	 	//获取第一个元素的id
-	 	var p1id:number = GameData.mapData[Math.floor(p1 / GameData.MaxColumn)][p1 % GameData.MaxRow];
-	 	//获取第二个元素的id
-	 	var p2id:number = GameData.mapData[Math.floor(p2 / GameData.MaxColumn)][p2 % GameData.MaxRow];
-
-	 	//交换两个元素的值
-	 	GameData.mapData[Math.floor(p1 / GameData.MaxColumn)][p1 % GameData.MaxRow] = p2id;
-	 	GameData.mapData[Math.floor(p2 / GameData.MaxColumn)][p2 % GameData.MaxRow] = p1id;
-
-	 	//调用上面的方法看交换完之后是否为ture
-	 	var rel:boolean = LinkLogic.isHaveLine();
-	 	if(rel)
-	 	{
-	 		GameData.elements[p1id].location = p2;
-	 		GameData.elements[p2id].location = p1;	
-	 		return true;
-	 	}
-	 	else
-	 	{	//不可以的话就把刚才的交换赋值，做逆向操作
-	 		GameData.mapData[Math.floor(p1 / GameData.MaxColumn)][p1 % GameData.MaxRow] = p1id;
-	 		GameData.mapData[Math.floor(p2 / GameData.MaxColumn)][p2 % GameData.MaxRow] = p2id;
-	 	}
-
-	 	//所有操作完之后没有任何的结果就给false
-	 	return false;
-	 }
-
-
-
-	
-
-
-
-
+        var l2row:number = Math.floor(GameData.elements[id2].location/GameData.MaxRow);
+        var l2col:number = GameData.elements[id2].location%GameData.MaxColumn;
+        console.log("判断两点互换位置",id1,GameData.elements[id1].location,l1row,l1col,"第二个",id2,GameData.elements[id2].location,l2row,l2col);
+        if(l1row==l2row)
+        {
+            if((l1col-l2col)==1||(l1col-l2col)==-1)
+            {
+                return true;
+            }
+        }
+        else if(l1col==l2col)
+        {
+            if((l1row-l2row)==1||(l1row-l2row)==-1)
+            {
+                /*var lot:number = GameData.elements[id1].location;
+                GameData.elements[id1].location = GameData.elements[id2].location;
+                GameData.elements[id2].location = lot;*/
+                return true;
+            }
+        }
+        return false;
+    }
 }

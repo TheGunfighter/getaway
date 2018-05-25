@@ -1,34 +1,36 @@
-class MapControl 
+class MapControl
 {
-	public constructor() {
+    public constructor()
+    {
 
-	}
+    }
 
-	//创建全地图元素
-	public createElementAllmap(){
-		this.createAllMap();
-	}
+    //创建全地图元素
+    public createElementAllMap()
+    {
+        this.createAllMap();
+    }
 
-
+    //根据空行创建元素
+    //在游戏初始时候
     public createElements(num:number):string[]
     {
+        return this.createElementByNumber(num);
+    }
+
+    //根据数量创建元素
+    //在游戏过程中
+    private createElementByNumber(val:number)
+    {
         var types:string[] = new Array();
-        for(var i:number=0;i<num;i++)
+        for(var i:number=0;i<val;i++)
         {
             types.push(this.createType());
         }
         return types;
     }
 
-
-
-	//针对某一个数据元素更新它得类型
-    public changeTypeByID(id:number)
-    {
-        GameData.elements[id].type = this.createType();
-    }
-
-	//创建全部地图元素
+    //创建全部地图元素
     //游戏开始时调用
     private createAllMap()
     {
@@ -67,11 +69,13 @@ class MapControl
                             havelink = false;
                         }
                     }
-                    id = GameData.unusedElements[0];
+                    //type = this.createType();
+                    id = GameData.unuseeElements[0];
+                    //console.log(id);
                     GameData.elements[id].type = type;
                     GameData.elements[id].location = i*GameData.MaxRow+t;
                     GameData.mapData[i][t] = id;
-                    GameData.unusedElements.shift();
+                    GameData.unuseeElements.shift();
                     havelink = true;
                     ztype = "";
                     htype = "";
@@ -80,19 +84,22 @@ class MapControl
         }
     }
 
-
-	//随机创建一个类型元素
+    //随机创建一个类型元素
     private createType():string
     {
-        return GameData.elementTypes[Math.floor(Math.random()*GameData.elementTypes.length)].toString();
+        return GameData.elementTyps[Math.floor(Math.random()*GameData.elementTyps.length)].toString();
     }
 
+    //针对某一个数据元素更新它得类型
+    public changeTypeByID(id:number)
+    {
+        GameData.elements[id].type = this.createType();
+    }
 
-
-	//根据当前删除得地图元素，刷新所有元素得位置
+    //根据当前删除得地图元素，刷新所有元素得位置
     public updateMapLocation()
     {
-        //id去重
+        //吧ID去重
         var ids:number[]=new Array();
         var len:number = LinkLogic.lines.length;
         for(var i:number=0;i<len;i++)
@@ -116,11 +123,13 @@ class MapControl
                 }
             }
         }
-        //ids是此次被删除得元素ID,要更新其他得元素位置，并未这几个ids定制新的类型和位置
+        //ids是此次被删除得元素ID,要更新其他得元素位置，并未这几个IDS定制新的类型和位置
         len = ids.length;
         var colarr:number[] = new Array();//存储列编号得数据，记录共有几列需要移动位置
+
         for(i=0;i<len;i++)
         {
+            //GameData.mapData[Math.floor(GameData.elements[ids[i]]/GameData.MaxRow)][GameData.elements[ids[i]]%GameData.MaxColumn] = -2;
             rel = false;
             for(t=0;t<colarr.length;t++)
             {
@@ -168,6 +177,7 @@ class MapControl
                 if(GameData.mapData[t][colarr[i]]!=-1)
                 {
                     GameData.mapData[t][colarr[i]] = newcolids[0];
+                    //console.log(newcolids);
                     GameData.elements[newcolids[0]].location = t*GameData.MaxRow+colarr[i];
                     newcolids.shift();
                 }
@@ -175,6 +185,68 @@ class MapControl
         }
 
     }
+/*
+    //按照格式打印map数据
+    private spr:egret.Sprite = new egret.Sprite();
+    public logAllMap(root:egret.Sprite)
+    {
+        this.updates();
 
+        this.spr.touchEnabled=true;
+        this.spr.addEventListener(egret.TouchEvent.TOUCH_BEGIN,this.tuo,this);
+        root.addChild(this.spr);
+    }
+    private updates()
+    {
+        var str:string = "";
+        var cstr:string = "";
+
+        this.spr.cacheAsBitmap = false;
+        this.spr.removeChildren();
+        for(var i:number=0;i<GameData.MaxRow;i++)
+        {
+            for(var t:number=0;t<GameData.MaxColumn;t++)
+            {
+                if(GameData.mapData[i][t]!=-1)
+                {
+                    cstr = "|id:"+GameData.mapData[i][t]+"|\n";
+                    cstr += "|type:" + GameData.elements[GameData.mapData[i][t]].type+"|\n";
+                    cstr += "|eid:" + GameData.elements[GameData.mapData[i][t]].id+"|\n";
+                    cstr += "|lot:"+GameData.elements[GameData.mapData[i][t]].location+"|\n";
+                    cstr += "|i,t:"+i.toString()+","+t.toString()+"|";
+                }
+                else
+                {
+                    cstr = "|id:"+GameData.mapData[i][t]+"|";
+                }
+                var txt:egret.TextField = new egret.TextField();
+                txt.text = cstr;
+                txt.size = 12;
+                txt.width = 100;
+                txt.height = 100;
+                txt.y = 70*i;
+                txt.x = 50*t;
+                this.spr.addChild(txt);
+            }
+        }
+        var shp:egret.Shape = new egret.Shape();
+        shp.graphics.beginFill(0,0.4);
+        shp.graphics.drawRect(0,0,this.spr.width,this.spr.height);
+        shp.graphics.endFill();
+        this.spr.addChildAt(shp,0);
+        this.spr.cacheAsBitmap = true;
+    }
+    private tuo(evt:egret.TouchEvent)
+    {
+        if(this.spr.x == GameData.stageW-20)
+        {
+            this.spr.x = 0;
+        }
+        else
+        {
+            this.spr.x = GameData.stageW-20;
+        }
+        this.updates();
+    }*/
 
 }
